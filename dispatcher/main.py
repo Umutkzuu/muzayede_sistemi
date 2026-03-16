@@ -28,3 +28,11 @@ async def proxy_post_items(item: dict):
             return response.json()
         except Exception as e:
             raise HTTPException(status_code=502, detail=str(e))
+        
+AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://auth_service:8002")
+
+@app.post("/register")
+async def proxy_register(user: dict):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(f"{AUTH_SERVICE_URL}/register", json=user)
+        return response.json()

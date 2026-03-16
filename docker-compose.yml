@@ -1,7 +1,5 @@
-version: '3.8'
-
 services:
-  # MongoDB Konteyneri
+  # NoSQL Veritabanımız
   mongodb:
     image: mongo:latest
     ports:
@@ -9,15 +7,33 @@ services:
     volumes:
       - mongo_data:/data/db
 
-  # Bizim yazdığımız Item Service
+  # Ürün Servisimiz
   item_service:
     build: ./item_service
-    ports:
-      - "8001:8001"
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
       - mongodb
+
+  # Kimlik Doğrulama Servisimiz (Hata veren yer burasıydı)
+  auth_service:
+    build: ./auth_service
+    environment:
+      - MONGO_DETAILS=mongodb://mongodb:27017
+    depends_on:
+      - mongodb
+
+  # Giriş Kapımız (API Gateway)
+  dispatcher:
+    build: ./dispatcher
+    ports:
+      - "8000:8000"
+    environment:
+      - ITEM_SERVICE_URL=http://item_service:8001
+      - AUTH_SERVICE_URL=http://auth_service:8002
+    depends_on:
+      - item_service
+      - auth_service
 
 volumes:
   mongo_data:
