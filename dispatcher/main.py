@@ -34,5 +34,19 @@ AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://auth_service:8002")
 @app.post("/register")
 async def proxy_register(user: dict):
     async with httpx.AsyncClient() as client:
-        response = await client.post(f"{AUTH_SERVICE_URL}/register", json=user)
+        try:
+            response = await client.post(f"{AUTH_SERVICE_URL}/register", json=user)
+            # JSON hatası almamak için önce içeriği kontrol et
+            if response.status_code >= 500:
+                raise HTTPException(status_code=502, detail="Auth Service çöktü!")
+            return response.json()
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=str(e))
+        
+
+@app.post("/login")
+async def proxy_login(user: dict):
+    async with httpx.AsyncClient() as client:
+        # Karşı servisteki /token endpoint'ine yönlendiriyoruz
+        response = await client.post(f"{AUTH_SERVICE_URL}/token", json=user)
         return response.json()
