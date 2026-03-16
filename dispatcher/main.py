@@ -50,3 +50,22 @@ async def proxy_login(user: dict):
         # Karşı servisteki /token endpoint'ine yönlendiriyoruz
         response = await client.post(f"{AUTH_SERVICE_URL}/token", json=user)
         return response.json()
+    
+@app.post("/items")
+async def proxy_post_items(item: dict, authorization: str = Header(None)):
+    async with httpx.AsyncClient() as client:
+        try:
+            # Gelen Authorization header'ını aynen item_service'e paslıyoruz
+            headers = {"Authorization": authorization} if authorization else {}
+            response = await client.post(
+                f"{ITEM_SERVICE_URL}/items", 
+                json=item, 
+                headers=headers
+            )
+            
+            if response.status_code >= 400:
+                raise HTTPException(status_code=response.status_code, detail=response.json())
+                
+            return response.json()
+        except Exception as e:
+            raise HTTPException(status_code=502, detail=str(e))
