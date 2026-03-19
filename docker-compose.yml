@@ -19,6 +19,16 @@ services:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
       - mongodb
+
+  gui_service:
+    build: ./gui_service
+    ports:
+      - "8501:8501"
+    environment:
+      - GATEWAY_URL=http://dispatcher:8000
+    depends_on:
+      - dispatcher
+
   bid_service:
     build: ./bid_service
     environment:
@@ -37,6 +47,15 @@ services:
     depends_on:
       - item_service
       - auth_service
-
+  locust:
+    image: locustio/locust
+    volumes:
+      - ./:/mnt/locust
+    command: -f /mnt/locust/locustfile.py --host http://dispatcher:8000
+    ports:
+      - "8089:8089"
+    depends_on:
+      - dispatcher
+      
 volumes:
   mongo_data:
