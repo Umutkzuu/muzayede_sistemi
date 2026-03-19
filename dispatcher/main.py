@@ -92,4 +92,32 @@ async def proxy_login(user: dict):
             raise HTTPException(status_code=401, detail="Hatalı kullanıcı adı veya şifre.")
         return response.json()
 
-# Buraya Bid Service yönlendirmesi gelecek...
+BID_SERVICE_URL = os.getenv("BID_SERVICE_URL", "http://bid_service:8003")
+
+@app.post("/bids")
+async def proxy_place_bid(bid_data: dict, user_data: dict = Depends(verify_access)):
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        # Güvenlik: User ID'yi kullanıcının gönderdiği veriden değil, TOKEN'dan alıyoruz!
+        bid_data["user_id"] = user_data["sub"]
+        
+        response = await client.post(f"{BID_SERVICE_URL}/bids", json=bid_data)
+        
+        if response.status_code >= 400:
+            return response.json()
+        return JSONResponse(status_code=201, content=response.json())
+    
+# dispatcher/main.py içine eklenecek GET rotası
+
+@app.get("/bids/{item_id}")
+async def proxy_get_bids(item_id: str):
+    async with httpx.AsyncClient(timeout=5.0) as client:
+        try:
+            # İsteği iç ağdaki Bid Service'e (8003) paslıyoruz
+            response = await client.get(f"{BID_SERVICE_URL}/bids/{item_id}")
+            
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail="Bu ürün için henüz teklif bulunamadı.")
+                
+            return response.json()
+        except Exception:
+            raise HTTPException(status_code=502, detail="Bid Service'e ulaşılamıyor.")
