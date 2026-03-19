@@ -1,33 +1,29 @@
 services:
-  # NoSQL Veritabanımız
   mongodb:
     image: mongo:latest
-    ports:
-      - "27017:27017"
     volumes:
       - mongo_data:/data/db
 
-  # Ürün Servisimiz
   item_service:
     build: ./item_service
+    # ports: - "8001:8001" SİLDİK (İzolasyon sağlandı)
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
       - mongodb
 
-  # Kimlik Doğrulama Servisimiz (Hata veren yer burasıydı)
   auth_service:
     build: ./auth_service
+    # ports: - "8002:8002" SİLDİK (İzolasyon sağlandı)
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
       - mongodb
 
-  # Giriş Kapımız (API Gateway)
   dispatcher:
     build: ./dispatcher
     ports:
-      - "8000:8000"
+      - "8000:8000" # Sadece bu kapı dış dünyaya açık
     environment:
       - ITEM_SERVICE_URL=http://item_service:8001
       - AUTH_SERVICE_URL=http://auth_service:8002
