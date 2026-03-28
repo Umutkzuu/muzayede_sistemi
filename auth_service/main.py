@@ -9,7 +9,7 @@ app = FastAPI(title="Müzayede Sistemi - Auth Service")
 # Şifre hashleme ayarı
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
 
-# MongoDB Bağlantısı (Docker ağına uygun)
+# MongoDB Bağlantısı
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
 client_db = AsyncIOMotorClient(MONGO_DETAILS)
 database = client_db.auction
@@ -35,14 +35,14 @@ async def register(user: User):
 from datetime import datetime, timedelta
 from jose import jwt
 
-# Güvenlik için gizli anahtar (Hocaya sunarken bunu bir değişkenle yönettiğini söyleyebilirsin)
+# Güvenlik için gizli anahtar 
 SECRET_KEY = "super-gizli-anahtar"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 @app.post("/token")
 async def login(user: User):
-    # Kullanıcıyı bul
+    
     db_user = await user_collection.find_one({"username": user.username})
     if not db_user or not pwd_context.verify(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Hatalı kullanıcı adı veya şifre")
