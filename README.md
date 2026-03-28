@@ -41,83 +41,34 @@ Son olarak, servisler arası iletişimin standartlaştırılması için  **REST 
 
 Dispatcher, sistemin "Giriş Kapısı" (Entry Point) olarak işlev gören, tüm dış istekleri karşılayan, kimlik doğrulaması yapan ve trafiği ilgili mikroservislere yönlendiren merkezi birimdir. Bu birim, projenin en kritik bileşeni olup tamamen asenkron bir yapıda tasarlanmıştır.
 
-### 2.2.1. TDD (Test-Driven Development) Uygulaması
-
-Dispatcher geliştirilirken TDD disiplini uygulanmış; fonksiyonel kodlar yazılmadan önce test_dispatcher.py üzerinden beklenen davranışlar kurgulanmıştır.
-
-* Red Phase : İlk aşamada **/health** ve **/items** yönlendirme testleri yazılmıştır. **test_get_items_routing** testinde, henüz arka plan servisleri ayağa kaldırılmadığı için sistemin 502 Bad Gateway dönmesi beklenmiş ve test bu şekilde doğrulanmıştır.
-* Green Phase : Testleri karşılayacak FastAPI endpoint'leri ve httpx asenkron istemcisi eklenerek testlerin başarıyla geçmesi sağlanmıştır.
-
-```python
-def test_health_check(client):
-    """Dispatcher'ın çalışıp çalışmadığını kontrol eden  test."""
-    response = client.get("/health")
-    assert response.status_code == 200
-    assert response.json() == {"status": "ok"}
-
-
-def test_get_items_routing(client):
-    """Dispatcher'ın /items isteğini yönlendirip yönlendirmediğini test eder."""
+graph TD
+    User((İstemci / Browser)) -->|Port: 8000| Disp[Dispatcher Gateway]
+    Locust[Locust Test Aracı] -->|Yük Testi: 8000| Disp
     
-    response = client.get("/items")
-    assert response.status_code == 502
-```
+    subgraph "Merkezi Yönetim (Gateway)"
+        Disp -->|Yetki Doğrulama| JWT{JWT Check}
+        JWT -->|Hatalı| E401[401 Unauthorized]
+        JWT -->|Geçerli / Public| Route[Yönlendirme Tablosu]
+    end
 
-### 2.2.2. RESTful Mimari ve RMM Seviye 2 Standartları
+    subgraph "İzole Mikroservis Ağı"
+        Route -->|Auth İşlemleri| AuthS[Auth Service: 8002]
+        Route -->|Ürün CRUD| ItemS[Item Service: 8001]
+        Route -->|Teklif Verme| BidS[Bid Service: 8003]
+    end
 
-Dispatcher, **Richardson Olgunluk Modeli (RMM) Seviye 2** prensiplerine tam uyum sağlar.  
-Bu uyum, hem HTTP fiillerinin (verbs) doğru kullanımı hem de dönen durum kodları (status codes) ile pekiştirilmiştir.
+    subgraph "NoSQL Veri İzolasyonu"
+        AuthS --- DB_User[(MongoDB: users)]
+        ItemS --- DB_Auction[(MongoDB: items)]
+        BidS --- DB_Bid[(MongoDB: bids)]
+    end
 
+    subgraph "Sunum Katmanı"
+        GUI[Streamlit GUI: 8501] -->|API Çağrısı| Disp
+    end
 
-
-### Teknoloji ve Port
-
-- Servis dış dünyaya **8000 portu** üzerinden hizmet verir.
-- Kullanılan teknolojiler:
-  - **FastAPI** → Web framework
-  - **httpx** → Asenkron HTTP iletişimi
-  - **jose (JWT)** → Kimlik doğrulama ve güvenlik
-
-
-
-### HTTP Fiil Kullanımı
-
-CRUD işlemleri için standart HTTP metodları kullanılır:
-
-- `GET`
-- `POST`
-- `PUT`
-- `DELETE`
-
-Bu istekler, ilgili mikroservislere **asenkron olarak proxy edilir**.
-
-
-
-### Durum Kodları (Status Codes)
-
-- **201 Created**  
-  `proxy_post_items` ve `proxy_place_bid` fonksiyonlarında, başarılı kaynak oluşturma sonrası döndürülür.
-
-- **204 No Content**  
-  `proxy_delete_item` fonksiyonunda, başarılı silme işlemi sonrası gövdesiz yanıt olarak döndürülür.
-
-- **401 Unauthorized**  
-  `verify_access` fonksiyonunda, token eksikliği veya geçersizliği durumunda fırlatılır.
-
-- **502 Bad Gateway**  
-  Arka plandaki mikroservislere ulaşılamadığı durumlarda, TDD senaryolarına uygun olarak üretilir.
-
-
- ### 2.2.3. Çalışma Mantığı ve Akış Diyagramı
-
-Dispatcher, asenkron G/Ç (I/O) desteği sunan FastAPI framework'ü ile geliştirilmiştir. Dış dünyadan gelen istekler `8000 portu` üzerinden karşılanır ve iç ağdaki (internal network) ilgili servislere `(Item:8001, Auth:8002, Bid:8003)` asenkron olarak iletilir.
-
-* Asenkron İletişim: Tüm yönlendirme işlemleri **httpx.AsyncClient** kullanılarak **non-blocking** (bloklanmayan) yapıda gerçekleştirilir.
-
-* Merkezi Güvenlik: `verify_access` fonksiyonu aracılığıyla ``JWT (JSON Web Token)`` tabanlı kimlik doğrulaması yapılır. ``python-jose`` kütüphanesi ile token içerisindeki sub (kullanıcı kimliği) alanı çözümlenerek yetkilendirme sağlanır.
-
-* Loglama: Her istek ve hata durumu logging modülü üzerinden takip edilerek sistemin izlenebilirliği artırılmıştır.
-
-* Dependency Injection	Depends(verify_access) kullanılarak sadece yetkili kullanıcıların kritik işlemleri (silme, güncelleme, teklif verme) yapması sağlanır.  
-
-
+    style Disp fill:#f9f,stroke:#333,stroke-width:2px
+    style JWT fill:#fff4dd,stroke:#d4a017,stroke-width:2px
+    style DB_User fill:#e1f5fe,stroke:#01579b
+    style DB_Auction fill:#e1f5fe,stroke:#01579b
+    style DB_Bid fill:#e1f5fe,stroke:#01579b
