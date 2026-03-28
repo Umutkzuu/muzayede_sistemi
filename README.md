@@ -6,8 +6,8 @@
 
 | | |
 |---|---|
-| **Öğrenci / Student** | Umut Kuzu(221307016) - Türkay Jafarlı() |
-| **Tarih / Date** | 2025–2026 Bahar / Spring |
+| **Öğrenci / Student** | Umut Kuzu (221307016) , Türkay Jafarlı() |
+| **Tarih / Date** | 28.03.2025 |
 | **Ders / Course** | Yazılım Geliştirme Laboratuvarı II |
 
 ---
@@ -392,38 +392,54 @@ Streamlit arayüzünün 3. sekmesinde yerleşik basit bir yük testi motoru bulu
 
 ### 4.3 Test Sonuçları / Test Results
 
-> 📸 **Locust Ekran Görüntüleri**
+#### 🧪 50 Eşzamanlı Kullanıcı / 50 Concurrent Users
+<img width="1488" height="900" alt="50 kullanıcı" src="https://github.com/user-attachments/assets/2a18ab9e-2154-4641-aeb8-85312cf0dc82" />
 
-<!-- LOCUST_SCREENSHOT_50_USERS -->
-> *50 eşzamanlı kullanıcı — ekran görüntüsü eklenecek*
 
----
 
-<!-- LOCUST_SCREENSHOT_100_USERS -->
-> *100 eşzamanlı kullanıcı — ekran görüntüsü eklenecek*
+> **Gözlem:** 50 kullanıcıda sistem kararlı çalıştı. ~30 RPS değerine ulaşıldı. p50 yanıt süresi ~100ms ile oldukça düşük seyretti. p95 ise ~2500ms'ye kadar çıktı ancak hata oranı minimumdaydı. Sistem bu yük altında sağlıklı çalışmaktadır.
 
 ---
 
-<!-- LOCUST_SCREENSHOT_200_USERS -->
-> *200 eşzamanlı kullanıcı — ekran görüntüsü eklenecek*
+#### 🧪 100 Eşzamanlı Kullanıcı / 100 Concurrent Users
+
+<img width="1488" height="900" alt="100 Kullanıcı" src="https://github.com/user-attachments/assets/4005fb9c-4aa9-4e76-86c2-1a7b2199e20e" />
+
+
+> **Gözlem:** 100 kullanıcıda RPS ~55'e yükseldi. p50 ~200ms stabil kaldı ancak p95 ~5000ms'ye ulaştı. Yük artışıyla birlikte bazı hata paketleri gözlemlendi. Dispatcher yönlendirme doğruluğunu korudu.
 
 ---
 
-<!-- LOCUST_SCREENSHOT_500_USERS -->
-> *500 eşzamanlı kullanıcı — ekran görüntüsü eklenecek*
+#### 🧪 200 Eşzamanlı Kullanıcı / 200 Concurrent Users
+
+
+<img width="1488" height="900" alt="200 Kullanıcı" src="https://github.com/user-attachments/assets/567cf7a5-a0d2-4fa7-bd00-0b867c037f65" />
+
+> **Gözlem:** 200 kullanıcıda p95 yanıt süresi ~6500ms'ye ulaştı. RPS ~25 seviyesinde dengelendi; sistemin bu noktada darboğaz yaşamaya başladığı gözlemlendi. Hata oranı belirgin şekilde arttı, MongoDB bağlantı havuzu baskı altına girdi.
+
+---
+
+#### 🧪 500 Eşzamanlı Kullanıcı / 500 Concurrent Users
+
+
+<img width="1488" height="900" alt="500 Kullanıcı" src="https://github.com/user-attachments/assets/562128ae-4823-4aeb-b816-26b3d64b3f55" />
+
+> **Gözlem:** 500 kullanıcıda p95 yanıt süresi ~25.000ms'ye (25 saniye) fırladı. Yüksek hata oranı gözlemlendi. Sistem bu yük seviyesinde belirgin şekilde zorlandı. Gerçek üretim ortamında horizontal scaling (birden fazla Dispatcher instance) ve MongoDB replica set ile bu durum iyileştirilebilir.
 
 ---
 
 ### 4.4 Ölçekleme & Değerlendirme / Scaling & Evaluation
 
-> 📊 *Locust ekran görüntüleri eklendikten sonra bu bölüme ortalama yanıt süreleri, hata oranları ve RPS (Request Per Second) değerleri tabloya aktarılacaktır.*
+| Eşzamanlı Kullanıcı | Maks. RPS | p50 Yanıt (ms) | p95 Yanıt (ms) | Hata Durumu |
+|---|---|---|---|---|
+| 50 | ~30 | ~100 | ~2.500 | ✅ Minimal |
+| 100 | ~55 | ~200 | ~5.000 | ⚠️ Az hata |
+| 200 | ~25 | ~300 | ~6.500 | ⚠️ Belirgin hata |
+| 500 | ~65 | ~400 | ~25.000 | ❌ Yüksek hata |
 
-| Eşzamanlı Kullanıcı | Ort. Yanıt Süresi (ms) | Hata Oranı (%) | RPS |
-|---|---|---|---|
-| 50 | — | — | — |
-| 100 | — | — | — |
-| 200 | — | — | — |
-| 500 | — | — | — |
+**Değerlendirme / Evaluation:**
+
+Sistem 50–100 kullanıcı aralığında sağlıklı ve kararlı çalışmaktadır. 200 kullanıcıdan itibaren MongoDB bağlantı havuzu ve async istek kuyruğu darboğaz oluşturmaktadır. 500 kullanıcıda p95 yanıt süresinin 25 saniyeye çıkması, mevcut tek-instance mimarisinin üretim için yetersiz kalacağını göstermektedir. Çözüm olarak Dispatcher'ın yatay ölçeklenmesi ve MongoDB bağlantı havuzu optimizasyonu önerilmektedir.
 
 ---
 
@@ -497,7 +513,7 @@ cd bid_service && pytest test_bids.py -v
 **Sınırlılıklar:**
 - Token yenileme (refresh token) mekanizması henüz implemente edilmedi.
 - Servisler arasında async event-driven iletişim (Kafka/RabbitMQ) bulunmuyor.
-- HTTPS/TLS desteği eklenmedi (üretim ortamı için gereklidir).
+- HTTPS/TLS desteği eklenmedi .
 - Servis sağlığı için health check endpoint sayısı sınırlı.
 
 ### 🇬🇧 Achievements & Limitations
@@ -512,7 +528,7 @@ cd bid_service && pytest test_bids.py -v
 **Limitations:**
 - Refresh token mechanism not yet implemented.
 - No async event-driven inter-service communication (Kafka/RabbitMQ).
-- HTTPS/TLS support not added (required for production).
+- HTTPS/TLS support not added ).
 - Limited health check endpoints per service.
 
 ### 🔮 Olası Geliştirmeler / Future Improvements
