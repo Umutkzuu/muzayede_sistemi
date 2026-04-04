@@ -8,6 +8,7 @@ from jose import jwt, JWTError
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Dispatcher")
+# Dispatcher icin loglama mekanizmasi
 
 app = FastAPI(title="Müzayede Sistemi - Dispatcher (RMM Level 2 Gateway)")
 # Dispatcher, gelen istekleri ilgili mikroservislere yonlendirir
