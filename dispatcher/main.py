@@ -10,6 +10,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Dispatcher")
 
 app = FastAPI(title="Müzayede Sistemi - Dispatcher (RMM Level 2 Gateway)")
+# Dispatcher, gelen istekleri ilgili mikroservislere yonlendirir
 
 
 ITEM_SERVICE_URL = os.getenv("ITEM_SERVICE_URL", "http://item_service:8001")
