@@ -18,6 +18,7 @@ class Item(BaseModel):
 @app.get("/items")
 async def get_items():
     items = []
+    # Veritabanindaki tum urunler listeye eklenir
     cursor = item_collection.find().to_list(length=100)
     for doc in await cursor:
         doc["_id"] = str(doc["_id"])
