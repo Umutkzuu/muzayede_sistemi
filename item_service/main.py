@@ -10,6 +10,7 @@ MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
 client_db = AsyncIOMotorClient(MONGO_DETAILS)
 item_collection = client_db.auction.items
 
+# Item modeli urun verisini temsil eder
 class Item(BaseModel):
     name: str
     description: str
