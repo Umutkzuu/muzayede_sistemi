@@ -71,7 +71,7 @@ with st.sidebar:
         st.success("Dispatcher & Items: ONLINE")
     except: st.error("Sistem Erişilemez!")
 
-# --- ANA PANEL  ---
+
 tab1, tab2, tab3 = st.tabs(["📦 Ürün Yönetimi", "📈 Canlı İzleme (Grafana Style)", "🚀 Yük Testi"])
 
 with tab1:
