@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List
 
 app = FastAPI(title="Müzayede Sistemi - Bid Service (NoSQL)")
+# Bid servisi baslatildi
 
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
