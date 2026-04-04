@@ -3,7 +3,7 @@ import pytest
 import sys
 import os
 
-# Yolu ayarlayalım
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 try:
