@@ -41,6 +41,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 @app.post("/token")
+# Kullanıcı girişini doğrulanması ve JWT access token oluşturulması 
 async def login(user: User):
     
     db_user = await user_collection.find_one({"username": user.username})
