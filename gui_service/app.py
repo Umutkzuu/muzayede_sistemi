@@ -44,7 +44,7 @@ async def run_load_test(users, seconds):
                     results.append({"timestamp": datetime.now(), "latency": r.elapsed.total_seconds() * 1000, "status": r.status_code})
     return pd.DataFrame(results)
 
-# --- ARAYÜZ BAŞLIĞI ---
+
 st.title("🎨 Bridge to Bridge Studio | Mikroservis Yönetim Paneli")
 st.markdown(f"**Durum:** {'🟢 Bağlı' if st.session_state.token else '🔴 Oturum Kapalı'}")
 
