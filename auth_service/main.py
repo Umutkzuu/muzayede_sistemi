@@ -8,6 +8,7 @@ app = FastAPI(title="Müzayede Sistemi - Auth Service")
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
+# Sifreler hashlenir
 
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
