@@ -19,7 +19,7 @@ def test_health_check(client):
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
-def test_get_items_routing(client): # client'ı parametre olarak alıyoruz
+def test_get_items_routing(client): 
     """Dispatcher'ın /items isteğini yönlendirip yönlendirmediğini test eder."""
     
     response = client.get("/items")

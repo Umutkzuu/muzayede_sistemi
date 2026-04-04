@@ -1,6 +1,6 @@
 import pytest
 from httpx import AsyncClient
-from main import app # Bu satır hata verecek çünkü main.py henüz yok!
+from main import app 
 
 @pytest.mark.asyncio
 async def test_create_bid_fail():
@@ -10,7 +10,7 @@ async def test_create_bid_fail():
             "item_id": "test_item_123",
             "amount": 500.0
         }
-        # Not: User_id normalde Dispatcher tarafından enjekte edilecek
+        
         response = await ac.post("/bids", json=payload)
     
     assert response.status_code == 201

@@ -77,7 +77,7 @@ async def proxy_delete_item(item_id: str, user_data: dict = Depends(verify_acces
         response = await client.delete(f"{ITEM_SERVICE_URL}/items/{item_id}")
         if response.status_code >= 400:
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
-        # RMM Seviye 2: Silme işlemi sonrası 204 No Content
+        
         return Response(status_code=204)
 
 # --- AUTH SERVICE YÖNLENDİRMELERİ ---

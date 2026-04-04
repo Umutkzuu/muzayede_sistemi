@@ -7,7 +7,7 @@ from typing import List
 
 app = FastAPI(title="Müzayede Sistemi - Bid Service (NoSQL)")
 
-# Veritabanı Bağlantısı (Ayrı NoSQL DB: bid_db)
+
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
 client = AsyncIOMotorClient(MONGO_DETAILS)
 database = client.bid_db 
