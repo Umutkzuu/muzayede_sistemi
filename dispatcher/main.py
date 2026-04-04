@@ -5,20 +5,20 @@ from fastapi import FastAPI, HTTPException, Header, Depends, Request, Response
 from fastapi.responses import JSONResponse
 from jose import jwt, JWTError
 
-# Loglama Ayarları
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Dispatcher")
 
 app = FastAPI(title="Müzayede Sistemi - Dispatcher (RMM Level 2 Gateway)")
 
-# Konfigürasyon
+
 ITEM_SERVICE_URL = os.getenv("ITEM_SERVICE_URL", "http://item_service:8001")
 AUTH_SERVICE_URL = os.getenv("AUTH_SERVICE_URL", "http://auth_service:8002")
 BID_SERVICE_URL = os.getenv("BID_SERVICE_URL", "http://bid_service:8003")
 SECRET_KEY = "super-gizli-anahtar"
 ALGORITHM = "HS256"
 
-# --- RMM LEVEL 2: GLOBAL HATA YÖNETİMİ ---
+
 @app.exception_handler(Exception)
 async def universal_exception_handler(request: Request, exc: Exception):
     status_code = 500
@@ -33,7 +33,7 @@ async def universal_exception_handler(request: Request, exc: Exception):
         content={"status": "error", "code": status_code, "message": message, "path": request.url.path}
     )
 
-# --- MERKEZİ YETKİ KONTROLÜ ---
+
 async def verify_access(authorization: str = Header(None)):
     if not authorization:
         raise HTTPException(status_code=401, detail="Yetkilendirme anahtarı (Token) eksik!")
@@ -45,7 +45,7 @@ async def verify_access(authorization: str = Header(None)):
     except Exception:
         raise HTTPException(status_code=401, detail="Geçersiz veya süresi dolmuş token!")
 
-# --- ITEM SERVICE YÖNLENDİRMELERİ (CRUD) ---
+
 
 @app.get("/items")
 async def proxy_get_items():
@@ -59,7 +59,7 @@ async def proxy_post_items(item: dict, user_data: dict = Depends(verify_access))
         response = await client.post(f"{ITEM_SERVICE_URL}/items", json=item)
         return JSONResponse(status_code=201, content=response.json())
 
-# --- YENİ: RMM LEVEL 2 - UPDATE (PUT) ---
+
 @app.put("/items/{item_id}")
 async def proxy_update_item(item_id: str, item_data: dict, user_data: dict = Depends(verify_access)):
     async with httpx.AsyncClient(timeout=5.0) as client:
@@ -69,7 +69,6 @@ async def proxy_update_item(item_id: str, item_data: dict, user_data: dict = Dep
             raise HTTPException(status_code=response.status_code, detail=response.json().get("detail"))
         return response.json()
 
-# --- YENİ: RMM LEVEL 2 - DELETE (DELETE) ---
 @app.delete("/items/{item_id}")
 async def proxy_delete_item(item_id: str, user_data: dict = Depends(verify_access)):
     async with httpx.AsyncClient(timeout=5.0) as client:
@@ -80,7 +79,6 @@ async def proxy_delete_item(item_id: str, user_data: dict = Depends(verify_acces
         
         return Response(status_code=204)
 
-# --- AUTH SERVICE YÖNLENDİRMELERİ ---
 
 @app.post("/register")
 async def proxy_register(user: dict):
@@ -96,7 +94,6 @@ async def proxy_login(user: dict):
         response = await client.post(f"{AUTH_SERVICE_URL}/token", json=user)
         return response.json()
 
-# --- BID SERVICE YÖNLENDİRMELERİ ---
 
 @app.post("/bids")
 async def proxy_place_bid(bid_data: dict, user_data: dict = Depends(verify_access)):
