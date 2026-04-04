@@ -2,7 +2,7 @@ import os
 from fastapi import FastAPI, HTTPException, Response, status
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
-from bson import ObjectId  # ID bazlı işlemler için şart
+from bson import ObjectId 
 
 app = FastAPI(title="Müzayede Sistemi - Item Service (Internal)")
 
@@ -31,7 +31,7 @@ async def create_item(item: Item):
     new_item["_id"] = str(result.inserted_id)
     return new_item
 
-# --- RMM LEVEL 2: UPDATE (PUT) ---
+
 @app.put("/items/{item_id}")
 async def update_item(item_id: str, item_data: Item):
     """
@@ -51,7 +51,7 @@ async def update_item(item_id: str, item_data: Item):
     
     return {"message": "Ürün başarıyla güncellendi", "id": item_id}
 
-# --- RMM LEVEL 2: DELETE (DELETE) ---
+
 @app.delete("/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_item(item_id: str):
     """
@@ -66,5 +66,5 @@ async def delete_item(item_id: str):
     if delete_result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Silinecek ürün bulunamadı")
     
-    # 204 No Content için Response objesi döndürüyoruz
+    
     return Response(status_code=status.HTTP_204_NO_CONTENT)

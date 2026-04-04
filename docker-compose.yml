@@ -6,7 +6,7 @@ services:
 
   item_service:
     build: ./item_service
-    # ports: - "8001:8001" SİLDİK (İzolasyon sağlandı)
+    
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
@@ -14,7 +14,7 @@ services:
 
   auth_service:
     build: ./auth_service
-    # ports: - "8002:8002" SİLDİK (İzolasyon sağlandı)
+    
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
     depends_on:
@@ -33,14 +33,14 @@ services:
     build: ./bid_service
     environment:
       - MONGO_DETAILS=mongodb://mongodb:27017
-    # ports kapalı (İzolasyon)
+    
     depends_on:
       - mongodb
 
   dispatcher:
     build: ./dispatcher
     ports:
-      - "8000:8000" # Sadece bu kapı dış dünyaya açık
+      - "8000:8000" 
     environment:
       - ITEM_SERVICE_URL=http://item_service:8001
       - AUTH_SERVICE_URL=http://auth_service:8002

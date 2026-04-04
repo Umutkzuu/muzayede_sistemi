@@ -1,7 +1,7 @@
 from locust import HttpUser, task, between
 
 class AuctionUser(HttpUser):
-    # Her sanal kullanıcı işlem yaptıktan sonra 1-3 saniye bekler (Gerçekçi simülasyon)
+    
     wait_time = between(1, 3)
 
     def on_start(self):

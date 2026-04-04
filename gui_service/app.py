@@ -8,16 +8,15 @@ from datetime import datetime
 import os
 
 
-# --- KONFİGÜRASYON ---
 GATEWAY_URL = os.getenv("GATEWAY_URL", "http://localhost:8000")
 st.set_page_config(page_title="B2B Studio Auction Admin", layout="wide")
 
-# Session State Hazırlığı
+
 if "token" not in st.session_state: st.session_state.token = None
 if "logs" not in st.session_state: st.session_state.logs = []
 if "metrics" not in st.session_state: st.session_state.metrics = pd.DataFrame(columns=["timestamp", "latency", "status"])
 
-# --- YARDIMCI FONKSİYONLAR ---
+
 def add_log(method, path, status):
     new_log = {
         "Zaman": datetime.now().strftime("%H:%M:%S"),
@@ -73,7 +72,7 @@ with st.sidebar:
         st.success("Dispatcher & Items: ONLINE")
     except: st.error("Sistem Erişilemez!")
 
-# --- ANA PANEL (TABLI YAPI) ---
+# --- ANA PANEL  ---
 tab1, tab2, tab3 = st.tabs(["📦 Ürün Yönetimi", "📈 Canlı İzleme (Grafana Style)", "🚀 Yük Testi"])
 
 with tab1:
@@ -100,7 +99,7 @@ with tab1:
             if not df_items.empty:
                 st.dataframe(df_items[["_id", "name", "starting_price"]], use_container_width=True)
                 
-                # SİLME İŞLEMİ (DELETE - RMM L2)
+                
                 target_id = st.selectbox("İşlem Yapılacak ID", df_items["_id"].tolist())
                 if st.button("🗑️ Seçili Eseri Sil (DELETE)"):
                     h = {"Authorization": f"Bearer {st.session_state.token}"}
