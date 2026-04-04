@@ -1,3 +1,4 @@
+# GUI servisi icin gerekli kutuphaneler
 streamlit
 httpx
 pandas
