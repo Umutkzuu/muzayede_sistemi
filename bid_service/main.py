@@ -21,6 +21,7 @@ class Bid(BaseModel):
 
 @app.post("/bids", status_code=201)
 async def place_bid(item_id: str = Body(...), amount: float = Body(...), user_id: str = Body("system")):
+    # Yeni teklif olusturulur ve veritabanina kaydedilir
     
     new_bid = {
         "item_id": item_id,
