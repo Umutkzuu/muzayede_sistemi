@@ -49,7 +49,7 @@ st.title("🎨 Bridge to Bridge Studio | Mikroservis Yönetim Paneli")
 st.markdown(f"**Durum:** {'🟢 Bağlı' if st.session_state.token else '🔴 Oturum Kapalı'}")
 
 with st.sidebar:
-    st.header("🔐 Yetkilendirme")
+    st.header("Yetkilendirme")
     if not st.session_state.token:
         user = st.text_input("Kullanıcı")
         pw = st.text_input("Şifre", type="password")
