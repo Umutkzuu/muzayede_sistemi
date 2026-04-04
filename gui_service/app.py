@@ -48,7 +48,6 @@ async def run_load_test(users, seconds):
 st.title("🎨 Bridge to Bridge Studio | Mikroservis Yönetim Paneli")
 st.markdown(f"**Durum:** {'🟢 Bağlı' if st.session_state.token else '🔴 Oturum Kapalı'}")
 
-# --- SIDEBAR (Giriş & Sağlık) ---
 with st.sidebar:
     st.header("🔐 Yetkilendirme")
     if not st.session_state.token:
