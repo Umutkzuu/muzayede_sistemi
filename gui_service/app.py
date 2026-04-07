@@ -44,13 +44,12 @@ async def run_load_test(users, seconds):
                     results.append({"timestamp": datetime.now(), "latency": r.elapsed.total_seconds() * 1000, "status": r.status_code})
     return pd.DataFrame(results)
 
-# --- ARAYÜZ BAŞLIĞI ---
+
 st.title("🎨 Bridge to Bridge Studio | Mikroservis Yönetim Paneli")
 st.markdown(f"**Durum:** {'🟢 Bağlı' if st.session_state.token else '🔴 Oturum Kapalı'}")
 
-# --- SIDEBAR (Giriş & Sağlık) ---
 with st.sidebar:
-    st.header("🔐 Yetkilendirme")
+    st.header("Yetkilendirme")
     if not st.session_state.token:
         user = st.text_input("Kullanıcı")
         pw = st.text_input("Şifre", type="password")
@@ -72,7 +71,7 @@ with st.sidebar:
         st.success("Dispatcher & Items: ONLINE")
     except: st.error("Sistem Erişilemez!")
 
-# --- ANA PANEL  ---
+
 tab1, tab2, tab3 = st.tabs(["📦 Ürün Yönetimi", "📈 Canlı İzleme (Grafana Style)", "🚀 Yük Testi"])
 
 with tab1:

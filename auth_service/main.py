@@ -8,6 +8,7 @@ app = FastAPI(title="Müzayede Sistemi - Auth Service")
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__ident="2b")
+# Sifreler hashlenir
 
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
@@ -41,6 +42,7 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 @app.post("/token")
+# Kullanıcı girişini doğrulanması ve JWT access token oluşturulması 
 async def login(user: User):
     
     db_user = await user_collection.find_one({"username": user.username})

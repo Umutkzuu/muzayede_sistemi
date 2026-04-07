@@ -10,6 +10,7 @@ MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
 client_db = AsyncIOMotorClient(MONGO_DETAILS)
 item_collection = client_db.auction.items
 
+# Item modeli urun verisini temsil eder
 class Item(BaseModel):
     name: str
     description: str
@@ -18,6 +19,7 @@ class Item(BaseModel):
 @app.get("/items")
 async def get_items():
     items = []
+    # Veritabanindaki tum urunler listeye eklenir
     cursor = item_collection.find().to_list(length=100)
     for doc in await cursor:
         doc["_id"] = str(doc["_id"])

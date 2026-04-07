@@ -1,3 +1,4 @@
+# Python tabanlı GUI servisi için Docker yapılandırması
 FROM python:3.10-slim
 
 WORKDIR /app

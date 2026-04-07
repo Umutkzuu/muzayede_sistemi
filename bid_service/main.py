@@ -6,6 +6,7 @@ from datetime import datetime
 from typing import List
 
 app = FastAPI(title="Müzayede Sistemi - Bid Service (NoSQL)")
+# Bid servisi baslatildi
 
 
 MONGO_DETAILS = os.getenv("MONGO_DETAILS", "mongodb://mongodb:27017")
@@ -21,7 +22,8 @@ class Bid(BaseModel):
 
 @app.post("/bids", status_code=201)
 async def place_bid(item_id: str = Body(...), amount: float = Body(...), user_id: str = Body("system")):
-    """Yeni bir teklif oluşturur."""
+    # Yeni teklif olusturulur ve veritabanina kaydedilir
+    
     new_bid = {
         "item_id": item_id,
         "amount": amount,
@@ -34,7 +36,7 @@ async def place_bid(item_id: str = Body(...), amount: float = Body(...), user_id
 
 @app.get("/bids/{item_id}")
 async def get_bids(item_id: str):
-    """Belirli bir ürün için tüm teklifleri listeler."""
+   
     bids = []
     cursor = bid_collection.find({"item_id": item_id}).sort("amount", -1)
     async for doc in cursor:
