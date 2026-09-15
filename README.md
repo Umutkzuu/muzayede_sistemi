@@ -6,7 +6,7 @@
 
 | | |
 |---|---|
-| **Öğrenci / Student** | Umut Kuzu (221307016) , Türkay Jafarli(221307112) |
+| **Öğrenci / Student** | Umut Kuzu (221307016) ,  |
 | **Tarih / Date** | 28.03.2025 |
 | **Ders / Course** | Yazılım Geliştirme Laboratuvarı II |
 
